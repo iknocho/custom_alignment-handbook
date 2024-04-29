@@ -40,7 +40,7 @@ from alignment import (
     get_quantization_config,
     get_tokenizer,
 )
-from trl import SFTTrainer, setup_chat_format
+from trl import SFTTrainer, setup_chat_format, DataCollatorForCompletionOnlyLM
 
 
 logger = logging.getLogger(__name__)
@@ -135,7 +135,7 @@ def main():
         fn_kwargs={
             "tokenizer": tokenizer,
             "task": "sft",
-            "auto_insert_empty_system_msg": data_args.auto_insert_empty_system_msg,
+            "auto_insert_empty_system_msg": data_args.auto_insert_empty_system_msg,# false
         },
         num_proc=data_args.preprocessing_num_workers,
         remove_columns=column_names,
@@ -159,6 +159,10 @@ def main():
         for index in random.sample(range(len(raw_datasets["train"])), 3):
             logger.info(f"Sample {index} of the processed training set:\n\n{raw_datasets['train'][index]['text']}")
 
+    instruction_template = "<|start_header_id|>user<|end_header_id|>"
+    response_template = "<|start_header_id|>assistant<|end_header_id|>"
+    collator = DataCollatorForCompletionOnlyLM(instruction_template=instruction_template, response_template=response_template, tokenizer=tokenizer, mlm=False)
+
     ########################
     # Initialize the Trainer
     ########################
@@ -171,9 +175,10 @@ def main():
         dataset_text_field="text",
         max_seq_length=training_args.max_seq_length,
         tokenizer=tokenizer,
-        packing=True,
+        packing=False,
         peft_config=get_peft_config(model_args),
         dataset_kwargs=training_args.dataset_kwargs,
+        data_collator=collator
     )
 
     ###############
