@@ -26,6 +26,8 @@ import torch
 import transformers
 from transformers import AutoModelForCausalLM, set_seed
 
+#sys.path.append('/home/harry/workspace/custom_alignment-handbook/src')
+
 from alignment import (
     DataArguments,
     H4ArgumentParser,
@@ -159,9 +161,9 @@ def main():
         for index in random.sample(range(len(raw_datasets["train"])), 3):
             logger.info(f"Sample {index} of the processed training set:\n\n{raw_datasets['train'][index]['text']}")
 
-    instruction_template = "<|start_header_id|>user<|end_header_id|>"
-    response_template = "<|start_header_id|>assistant<|end_header_id|>"
-    collator = DataCollatorForCompletionOnlyLM(instruction_template=instruction_template, response_template=response_template, tokenizer=tokenizer, mlm=False)
+    #instruction_template = "<|start_header_id|>user<|end_header_id|>"
+    #response_template = "<|start_header_id|>assistant<|end_header_id|>"
+    #collator = DataCollatorForCompletionOnlyLM(instruction_template=instruction_template, response_template=response_template, tokenizer=tokenizer, mlm=False)
 
     ########################
     # Initialize the Trainer
@@ -178,7 +180,6 @@ def main():
         packing=False,
         peft_config=get_peft_config(model_args),
         dataset_kwargs=training_args.dataset_kwargs,
-        data_collator=collator
     )
 
     ###############
