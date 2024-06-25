@@ -122,10 +122,14 @@ def main():
 
     model = model_args.model_name_or_path
     # For ChatML we need to add special tokens and resize the embedding layer
+    """
     if "<|im_start|>" in tokenizer.chat_template and "gemma-tokenizer-chatml" not in tokenizer.name_or_path:
         model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, **model_kwargs)
         model, tokenizer = setup_chat_format(model, tokenizer)
+        print("MODEL : ",model)
+        breakpoint()
         model_kwargs = None
+    """
 
     #####################
     # Apply chat template
@@ -151,17 +155,16 @@ def main():
     logger.info(
         f"Decontaminated {num_filtered_train_samples} ({num_filtered_train_samples/num_raw_train_samples * 100:.2f}%) samples from the training set."
     )
-
+    
     train_dataset = raw_datasets["train"]
     eval_dataset = raw_datasets["test"]
 
     with training_args.main_process_first(desc="Log a few random samples from the processed training set"):
-        for index in random.sample(range(len(raw_datasets["train"])), 3):
+        for index in random.sample(range(len(raw_datasets["train"])), 10):
             logger.info(f"Sample {index} of the processed training set:\n\n{raw_datasets['train'][index]['text']}")
-
-    instruction_template = "<|start_header_id|>user<|end_header_id|>"
-    response_template = "<|start_header_id|>assistant<|end_header_id|>"
-    collator = DataCollatorForCompletionOnlyLM(instruction_template=instruction_template, response_template=response_template, tokenizer=tokenizer, mlm=False)
+    #instruction_template = "<|start_header_id|>user<|end_header_id|>"
+    #response_template = "<|start_header_id|>assistant<|end_header_id|>"
+    #collator = DataCollatorForCompletionOnlyLM(instruction_template=instruction_template, response_template=response_template, tokenizer=tokenizer, mlm=False)
 
     ########################
     # Initialize the Trainer
@@ -178,7 +181,7 @@ def main():
         packing=False,
         peft_config=get_peft_config(model_args),
         dataset_kwargs=training_args.dataset_kwargs,
-        data_collator=collator
+        #data_collator=collator
     )
 
     ###############
