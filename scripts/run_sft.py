@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 def main():
     parser = H4ArgumentParser((ModelArguments, DataArguments, SFTConfig))
     model_args, data_args, training_args = parser.parse()
-
+    print("training_args : ",training_args)
     # Set seed for reproducibility
     set_seed(training_args.seed)
 

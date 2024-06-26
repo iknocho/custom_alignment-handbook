@@ -249,6 +249,10 @@ class SFTConfig(transformers.TrainingArguments):
         default=True,
         metadata={"help": ("Whether to log and evaluate the first global_step or not.")},
     )
+    max_grad_norm: Optional[int] = field(
+        default=None,
+        metadata={"help": ("config grad clipping")}
+    )
     optim: Optional[str] = field(default="adamw_torch")
 
 
